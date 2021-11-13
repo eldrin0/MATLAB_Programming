@@ -21,24 +21,38 @@ else
     disp(det(A))
     %using gauss method we can only solve systems of equations
     %which matrix determinant is not equal to 0
-    if det(A) ~= 0
-        s=1; %a variable used later to check if we should find the solution matrix
+    if det(A) == 0
+        disp('det(A) = 0')
+        disp('This system of equations does not have a solution!')
+    else
+       s=1; %a variable used later to check if we should find the solution matrix
+       iteration_1 = 0;
        for j = 1:(n-1)
            for i = j:(n-1)
                if Ab(j,j) == 0
-                  if Ab(j+1,j) ~= 0
-                      disp("row change")
-                      temp = Ab(j,:);
-                      Ab(j,:)=Ab(j+1,:);
-                      Ab(j+1,:)=temp;
-                  else
-                      disp('The system does not have solution!')
-                      s=0;
-                      break;
-                  end
+                   if Ab([j+1:n],j) == 0
+                       disp('This system of equations does not have a solution!')
+                       iteration_1 = iteration_1 + 1;
+                       s=0;
+                       break;
+                   else
+                       iteration_2 = 0;
+                       for dr= 1:n-j
+                          if Ab(j+dr,j)~=0 && iteration_2 ==0
+                              disp("row change")
+                              iteration_2 = iteration_2 + 1;
+                              temp = Ab(j,:);
+                              Ab(j,:)=Ab(j+dr,:);
+                              Ab(j+dr,:)=temp;
+                          end
+                       end
+                   end
                end
-               Ab(i+1,:)=Ab(i+1,:)-(Ab(i+1,j)/Ab(j,j)).*Ab(j,:);
-               disp(Ab)
+               if iteration_1 == 0
+                   Ab(i+1,:)=Ab(i+1,:)-(Ab(i+1,j)/Ab(j,j)).*Ab(j,:);
+                   pause(1)
+                   disp(Ab)
+               end
            end
        end
        
@@ -46,8 +60,8 @@ else
        if s ~= 0
            %Give matrix A& vector b the current values after elementary row
            %operations
-           A=Ab(:,1:3);
-           b=Ab(:,4);
+           A=Ab(:,[1:n]);
+           b=Ab(:,n+1);
            
            %Solve the system from the bottom to the top
            X(n)=b(n)/A(n,n);
@@ -57,8 +71,5 @@ else
            disp('X=')
            disp(X)
        end
-    else
-        disp('det(A) = 0')
-        disp('The system does not have solution!')
     end
 end
